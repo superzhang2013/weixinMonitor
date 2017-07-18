@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <TextView
+        android:id="@+id/ready_monitor_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="准备开始监听!"
+        />
+
+    <TextView
+        android:id="@+id/start_permission_view"
+        android:layout_width="100dp"
+        android:layout_height="30dp"
+        android:layout_below="@id/ready_monitor_view"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:background="#00b0ff"
+        android:gravity="center"
+        android:text="开启监听"
+        android:textColor="#ffffff"
+        />
+
+    <TextView
+        android:id="@+id/stop_permission_view"
+        android:layout_width="100dp"
+        android:layout_height="30dp"
+        android:layout_below="@id/start_permission_view"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:background="#00b0ff"
+        android:gravity="center"
+        android:text="关闭监听"
+        android:textColor="#ffffff"
+        />
+
+
+</RelativeLayout>

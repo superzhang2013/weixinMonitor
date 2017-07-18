@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">weixinMonitor</string>
+    <string name="accessibility_description">微信消息监听</string>
+</resources>

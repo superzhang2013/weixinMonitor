@@ -1,0 +1,27 @@
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+
+ext {
+
+    //libraries
+    rxJavaVersion = '1.1.6'
+    rxAndroidVersion = '1.0.1'
+    gsonVersion = '2.4'
+    okHttpVersion = '2.7.5'
+    greenDaoVersion = '2.0.0'
+    eventBusVersion = '2.4.0'
+    retrofitVersion = '1.6.0'
+
+    dataDependencies = [
+            okHttp             : "com.squareup.okhttp:okhttp:${okHttpVersion}",
+            okHttpUrlConnection: "com.squareup.okhttp:okhttp-urlconnection:${okHttpVersion}",
+            gson               : "com.google.code.gson:gson:${gsonVersion}",
+            rxJava             : "io.reactivex:rxjava:${rxJavaVersion}",
+            rxAndroid          : "io.reactivex:rxandroid:${rxAndroidVersion}",
+            greenDao           : "de.greenrobot:greendao:${greenDaoVersion}",
+            retrofit           : "com.squareup.retrofit:retrofit:${retrofitVersion}",
+    ]
+}

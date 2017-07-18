@@ -1,0 +1,32 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'application'
+
+group = 'de.greenrobot'
+version = '1.4.0-SNAPSHOT'
+sourceCompatibility = 1.6
+mainClassName = "com.demo.zh.daogenerator.DaoGeneratorImpl"
+
+dependencies {
+
+    def greenDaoVersion = rootProject.ext.greenDaoVersion
+
+    compile "de.greenrobot:greendao-generator:${greenDaoVersion}"
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+            srcDir 'src-gen'
+        }
+    }
+}
+
+artifacts {
+    archives jar
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
