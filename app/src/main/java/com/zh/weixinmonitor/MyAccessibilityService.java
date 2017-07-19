@@ -698,29 +698,34 @@ public class MyAccessibilityService extends AccessibilityService {
 
         if (childContentNodes != null && childContentNodes.size() > 0) {
             lastSendContent = childContentNodes.get(0).getText().toString();
-            List<AccessibilityNodeInfo> userNameNodes = accessibilityNodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/ik");
-            AccessibilityNodeInfo userNameNode = null;
+        } else {
+            AccessibilityNodeInfo childContentNode = accessibilityNodeInfo.getChild(1);
+            if (childContentNode != null) {
+                lastSendContent = childContentNode.getText().toString();
+            }
+        }
 
-            AccessibilityNodeInfo userInfoNode = null;
-            if (userNameNodes != null && userNameNodes.size() > 0) {
-                userNameNode = userNameNodes.get(0);
-                if ("android.widget.ImageView".equals(userNameNode.getClassName()) && userNameNode.isClickable()) {
-                    //获取聊天对象,这里两个if是为了确定找到的这个ImageView是头像的
-                    if (!TextUtils.isEmpty(userNameNode.getContentDescription())) {
-                        lastChatName = userNameNode.getContentDescription().toString();
-                        if (lastChatName.contains("头像")) {
-                            lastChatName = lastChatName.replace("头像", "");
-                        }
-                    }
+        List<AccessibilityNodeInfo> userNameNodes = accessibilityNodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/ik");
+        AccessibilityNodeInfo userNameNode = null;
+        if (userNameNodes != null && userNameNodes.size() > 0) {
+            userNameNode = userNameNodes.get(0);
+        } else {
+            userNameNode = accessibilityNodeInfo.getChild(0);
+        }
+        if (userNameNode != null && "android.widget.ImageView".equals(userNameNode.getClassName()) && userNameNode.isClickable()) {
+            //获取聊天对象,这里两个if是为了确定找到的这个ImageView是头像的
+            if (!TextUtils.isEmpty(userNameNode.getContentDescription())) {
+                lastChatName = userNameNode.getContentDescription().toString();
+                if (lastChatName.contains("头像")) {
+                    lastChatName = lastChatName.replace("头像", "");
                 }
             }
-            ChatBean chatBean = new ChatBean();
-            chatBean.sendContent = lastSendContent;
-            Log.i(TAG, "last sendContent real is " + lastSendContent);
-            chatBean.chatBean = new UserBean();
-            chatBean.chatBean.weixinNickName = lastChatName;
-            currentLastChatBean = chatBean;
         }
+        ChatBean chatBean = new ChatBean();
+        chatBean.sendContent = lastSendContent;
+        chatBean.chatBean = new UserBean();
+        chatBean.chatBean.weixinNickName = lastChatName;
+        currentLastChatBean = chatBean;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -772,7 +777,6 @@ public class MyAccessibilityService extends AccessibilityService {
 
                     String lastChatContent = lastChatBean.sendContent;
                     if (currentLastChatBean != null && lastChatContent.equals(currentLastChatBean.sendContent)) {
-                        Log.i(TAG, "last sendContent loopCurrentChatInfo " + currentLastChatBean.sendContent);
                         if (dbUsers != null && dbUsers.size() > 0) {
                             DBUser dbUser = dbUsers.get(0);
                             if (currentLastChatBean.chatBean != null && !TextUtils.isEmpty(currentLastChatBean.chatBean.weixinNickName)
@@ -821,7 +825,6 @@ public class MyAccessibilityService extends AccessibilityService {
             List<AccessibilityNodeInfo> chatListNodes = rootNode.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/a3e");
             List<AccessibilityNodeInfo> chatInfoNodes = rootNode.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/p");
             if (chatInfoNodes != null && chatInfoNodes.size() > 0) {
-                Log.i(TAG, "last sendContent currentChatPageTopNode " + (currentChatPageTopNode == null));
                 if (currentChatPageTopNode == null) {
                     //第一次进入本聊天界面
                     currentChatPageTopNode = chatInfoNodes.get(0);
@@ -975,7 +978,7 @@ public class MyAccessibilityService extends AccessibilityService {
                                 startIndex = i + 1;
                             }
                             realSendChatBeans.addAll(sendChatBeans.subList(startIndex, sendChatBeans.size()));
-                            if (TextUtils.isEmpty(currentLastChatBean.sendTime)) {
+                            if (currentLastChatBean != null && TextUtils.isEmpty(currentLastChatBean.sendTime)) {
                                 currentLastChatBean.sendTime = sendChatBeans.get(sendChatBeans.size() - 1).sendTime;
                             }
                             for (int j = 0; j < realSendChatBeans.size(); j++) {
@@ -1044,6 +1047,7 @@ public class MyAccessibilityService extends AccessibilityService {
         } else {
             uploadChatBeens.add(uploadChatBean);
         }
+
 //        uploadChatBean(uploadChatBeens, currentGroupUpoadFilePath);
     }
 

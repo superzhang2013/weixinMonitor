@@ -80,6 +80,9 @@ public class DBApiImpl implements IDBApi {
         if (TextUtils.isEmpty(weixinNickName)) {
             weixinName = "";
         }
+        if (TextUtils.isEmpty(sendTime)) {
+            sendTime = "";
+        }
         List<DBGroupLastChatLog> dbGroupLastChatLogs = dao.queryBuilder().
                 where(DBGroupLastChatLogDao.Properties.SessonGroupName.eq(groupName)).list();
         if (dbGroupLastChatLogs.size() > 0) {
