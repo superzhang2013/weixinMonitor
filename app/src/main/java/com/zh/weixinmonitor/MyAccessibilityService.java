@@ -128,6 +128,7 @@ public class MyAccessibilityService extends AccessibilityService {
                         isChatLogFinished = false;
                         isCurrentChatLogSend = false;
                         isScrollFromUser = true;
+                        currentChatPageTopNode = null;
                         getChatDetailList(rootNode);
                     } else {
                         //遍历当前对话列表 并进行消息记录遍历
@@ -243,7 +244,6 @@ public class MyAccessibilityService extends AccessibilityService {
             }
 
             AccessibilityNodeInfo listViewNode = listViewNodes.get(0);
-
             if (preClickNodeInfo == null && !isTaskFinished && listViewNode != null && "android.widget.ListView".equals(listViewNode.getClassName())) {
                 //一旦屏幕已经滚动，当前遍历的任务数全部清空
                 Log.i(TAG, "execute screen getChatList currentPageAlreadyHandleGroups clear " + currentPageAlreadyHandleGroups.toString());
@@ -716,6 +716,7 @@ public class MyAccessibilityService extends AccessibilityService {
             }
             ChatBean chatBean = new ChatBean();
             chatBean.sendContent = lastSendContent;
+            Log.i(TAG, "last sendContent real is " + lastSendContent);
             chatBean.chatBean = new UserBean();
             chatBean.chatBean.weixinNickName = lastChatName;
             currentLastChatBean = chatBean;
@@ -771,6 +772,7 @@ public class MyAccessibilityService extends AccessibilityService {
 
                     String lastChatContent = lastChatBean.sendContent;
                     if (currentLastChatBean != null && lastChatContent.equals(currentLastChatBean.sendContent)) {
+                        Log.i(TAG, "last sendContent loopCurrentChatInfo " + currentLastChatBean.sendContent);
                         if (dbUsers != null && dbUsers.size() > 0) {
                             DBUser dbUser = dbUsers.get(0);
                             if (currentLastChatBean.chatBean != null && !TextUtils.isEmpty(currentLastChatBean.chatBean.weixinNickName)
@@ -805,9 +807,11 @@ public class MyAccessibilityService extends AccessibilityService {
                 }
             }
         }
-        if ("android.widget.ListView".equals(listviewNode.getClassName()) && listviewNode.isScrollable()) {
+        if ("android.widget.ListView".equals(listviewNode.getClassName())) {
             isScrollFromUser = true;
-            listviewNode.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD);
+            if (listviewNode.isScrollable()) {
+                listviewNode.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD);
+            }
         }
     }
 
@@ -817,6 +821,7 @@ public class MyAccessibilityService extends AccessibilityService {
             List<AccessibilityNodeInfo> chatListNodes = rootNode.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/a3e");
             List<AccessibilityNodeInfo> chatInfoNodes = rootNode.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/p");
             if (chatInfoNodes != null && chatInfoNodes.size() > 0) {
+                Log.i(TAG, "last sendContent currentChatPageTopNode " + (currentChatPageTopNode == null));
                 if (currentChatPageTopNode == null) {
                     //第一次进入本聊天界面
                     currentChatPageTopNode = chatInfoNodes.get(0);
@@ -863,16 +868,20 @@ public class MyAccessibilityService extends AccessibilityService {
                                 }
                             } else {
                                 //向上滚动一页
-                                if ("android.widget.ListView".equals(listviewNode.getClassName()) && listviewNode.isScrollable()) {
-                                    listviewNode.performAction(AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD);
+                                if ("android.widget.ListView".equals(listviewNode.getClassName())) {
+                                    if (listviewNode.isScrollable()) {
+                                        listviewNode.performAction(AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD);
+                                    }
                                     currentActionType = ACTION_TYPE_FIND_LAST_CHAT_LOG;
                                 }
                             }
                         } else {
                             //循环向上进行查找
                             isLastTaskInCurrentPage(rootNode, listviewNode, childCount);
-                            if ("android.widget.ListView".equals(listviewNode.getClassName()) && listviewNode.isScrollable()) {
-                                listviewNode.performAction(AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD);
+                            if ("android.widget.ListView".equals(listviewNode.getClassName())) {
+                                if (listviewNode.isScrollable()) {
+                                    listviewNode.performAction(AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD);
+                                }
                                 currentActionType = ACTION_TYPE_FIND_LAST_CHAT_LOG;
                             }
                         }
@@ -899,16 +908,20 @@ public class MyAccessibilityService extends AccessibilityService {
                                     getChatInfo(rootNode);
                                 } else {
                                     //继续向上滚动，并查找有效时间
-                                    if ("android.widget.ListView".equals(listviewNode.getClassName()) && listviewNode.isScrollable()) {
-                                        listviewNode.performAction(AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD);
+                                    if ("android.widget.ListView".equals(listviewNode.getClassName())) {
+                                        if (listviewNode.isScrollable()) {
+                                            listviewNode.performAction(AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD);
+                                        }
                                         currentActionType = ACTION_TYPE_GET_LAST_CHAT_LOG_TIME;
                                     }
                                 }
                             }
                         } else {
                             //向上滚动一页
-                            if ("android.widget.ListView".equals(listviewNode.getClassName()) && listviewNode.isScrollable()) {
-                                listviewNode.performAction(AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD);
+                            if ("android.widget.ListView".equals(listviewNode.getClassName())) {
+                                if (listviewNode.isScrollable()) {
+                                    listviewNode.performAction(AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD);
+                                }
                                 currentActionType = ACTION_TYPE_FIND_LAST_CHAT_LOG;
                             }
                         }
@@ -927,8 +940,10 @@ public class MyAccessibilityService extends AccessibilityService {
                             isScrollFromUser = true;
                             getChatInfo(rootNode);
                         } else {
-                            if ("android.widget.ListView".equals(listviewNode.getClassName()) && listviewNode.isScrollable()) {
-                                listviewNode.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD);
+                            if ("android.widget.ListView".equals(listviewNode.getClassName())) {
+                                if (listviewNode.isScrollable()) {
+                                    listviewNode.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD);
+                                }
                                 currentActionType = ACTION_TYPE_GET_LAST_CHAT_LOG_TIME;
                             }
                         }
@@ -995,11 +1010,11 @@ public class MyAccessibilityService extends AccessibilityService {
 
     private void saveThisTimeLastChatLog() {
         String groupName = currentCheckGroupName;
-//        currentLastChatBean.
         if (currentLastChatBean == null) {
             return;
         }
-        Log.i(TAG, "save last chat bean is " + currentLastChatBean.sendContent);
+
+        Log.i(TAG, "last sendContent bean is " + currentLastChatBean.sendContent);
         DataApiFactory.getInstance().getIDBApi().saveGroupLastChatLog(groupName, String.valueOf(currentLastChatLogTime),
                 currentLastChatBean.chatBean.userWeiXinName, currentLastChatBean.chatBean.weixinNickName, currentLastChatBean.sendContent, 0);
     }
@@ -1029,7 +1044,6 @@ public class MyAccessibilityService extends AccessibilityService {
         } else {
             uploadChatBeens.add(uploadChatBean);
         }
-
 //        uploadChatBean(uploadChatBeens, currentGroupUpoadFilePath);
     }
 

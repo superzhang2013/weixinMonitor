@@ -89,6 +89,7 @@ public class DBApiImpl implements IDBApi {
             dbGroupLastChatLog.setSendTime(sendTime);
             dbGroupLastChatLog.setSendWeiXinName(weixinName);
             dbGroupLastChatLog.setSendWeiXinNickName(weixinNickName);
+            dao.update(dbGroupLastChatLog);
             return dbGroupLastChatLog;
         } else {
             DBGroupLastChatLog dbGroupLastChatLog = new DBGroupLastChatLog();
