@@ -244,7 +244,7 @@ public class MyAccessibilityService extends AccessibilityService {
 
             AccessibilityNodeInfo listViewNode = listViewNodes.get(0);
 
-            if (preClickNodeInfo == null && !isTaskFinished && listViewNode != null && "android.widget.ListView".equals(listViewNode.getClassName()) && listViewNode.isScrollable()) {
+            if (preClickNodeInfo == null && !isTaskFinished && listViewNode != null && "android.widget.ListView".equals(listViewNode.getClassName())) {
                 //一旦屏幕已经滚动，当前遍历的任务数全部清空
                 Log.i(TAG, "execute screen getChatList currentPageAlreadyHandleGroups clear " + currentPageAlreadyHandleGroups.toString());
                 currentPageAlreadyHandleGroups.clear();
